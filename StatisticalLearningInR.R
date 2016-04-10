@@ -12,7 +12,7 @@ abline(fit1, col="red")
 names(fit1)
 hist(fit1$residuals) # See if residual are normally distributed
 Boston
-confint(fit1)
+confint(fit1) # Confidence interval for intercept and slope
 predict(fit1, data.frame(lstat=c(5,10,15)), interval="confidence") # See lower and upper confidence band
 
 ### Multiple Linear regression
@@ -57,7 +57,7 @@ contrasts(Carseats$ShelveLoc) # Gives levels for ShelveLoc qualitative predictor
 
 ### Functions
 attach(Carseats)
-regplot = function(x,y,...){ // ... adds additional parameters to function signature used later in body
+regplot = function(x,y,...){ # ... adds additional parameters to function signature used later in body
   fit=lm(y~x)
   plot(x,y,...)
   abline(fit, col="red")
