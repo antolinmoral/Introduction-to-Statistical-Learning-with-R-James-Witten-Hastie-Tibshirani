@@ -57,7 +57,7 @@ contrasts(Carseats$ShelveLoc) # Gives levels for ShelveLoc qualitative predictor
 
 ### Functions
 attach(Carseats)
-regplot = function(x,y,...){
+regplot = function(x,y,...){ // ... adds additional parameters to function signature used later in body
   fit=lm(y~x)
   plot(x,y,...)
   abline(fit, col="red")
