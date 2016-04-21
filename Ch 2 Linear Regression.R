@@ -1,6 +1,10 @@
 library(MASS) # Built-in dataset library
 library(ISLR) # Data library for Introduction to Statistial Learning in R, Hastie Tibshirani
 
+###########################
+## Ch 2 Linear Regression
+###########################
+
 ### Simple Linear regression
 names(Boston) # The Boston dataframe
 ?Boston
