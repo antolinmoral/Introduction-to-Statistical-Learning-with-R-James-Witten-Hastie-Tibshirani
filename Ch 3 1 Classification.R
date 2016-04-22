@@ -3,6 +3,7 @@ names(Smarket)
 summary(Smarket)
 ?Smarket
 pairs(Smarket, col=Smarket$Direction)
+
 # Logistic Regression
 glm.fit = glm(Direction~Lag1+Lag2+Lag3+Lag4+Lag5+Volume, data=Smarket, family=binomial)
 summary(glm.fit)
@@ -30,4 +31,14 @@ mean(glm.pred==Direction.2005)
 summary(glm.fit) 
 
 
-
+# Linear Discriminant Analysis (LDA)
+require(ISLR)
+require(MASS) # Hadley Wickham's package for useful functions
+lda.fit = lda(Direction~Lag1+Lag2, data=Smarket, subset=Year<2005)
+lda.fit 
+plot(lda.fit)
+Smarket.2005 = subset(Smarket, Year == 2005)
+lda.pred = predict(lda.fit, Smarket.2005)
+data.frame(lda.pred)[1:5,]
+table(lda.pred$class, Smarket.2005$Direction) # Confusion matrix
+mean(lda.pred$class==Smarket.2005$Direction) # Trues and Falses are coerces to 1's and 0's, which can take the mean of
