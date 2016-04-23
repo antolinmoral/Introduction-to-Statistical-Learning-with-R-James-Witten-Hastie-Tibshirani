@@ -42,3 +42,21 @@ lda.pred = predict(lda.fit, Smarket.2005)
 data.frame(lda.pred)[1:5,]
 table(lda.pred$class, Smarket.2005$Direction) # Confusion matrix
 mean(lda.pred$class==Smarket.2005$Direction) # Trues and Falses are coerces to 1's and 0's, which can take the mean of
+
+
+
+# K-Nearest Neighbors algorithm
+library(class)
+library(purrr)
+attach(Smarket)
+Xlag = cbind(Lag1, Lag2)
+train = Year <2005
+knnfn <- function (k) {
+  knn.pred = knn(Xlag[train,], Xlag[!train,], Direction[train], k)
+  #knn.pred
+  table(knn.pred, Direction[!train])
+  mean(knn.pred==Direction[!train])  
+}
+classi_perf = flatten_dbl(lapply(1:10, knnfn))
+plot(classi_perf)
+  
