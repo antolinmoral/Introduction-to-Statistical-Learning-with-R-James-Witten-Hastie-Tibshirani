@@ -6,28 +6,32 @@ plot(mpg~horsepower, data= Auto)
 
 View(Auto)
 
+## Use cross validation to determine hyperparameter degree d of polynomial to fit the data
+## using glm
 ## LOOVC - Leave one out cross validation
-glm.fit = glm(mpg~horsepower, data=Auto) # If family is specified, fits a linear model
-cv.glm(Auto, glm.fit)$delta # Brute force fitting; Slow!!!
+## K-fold cross validation
+glm.fit = glm(mpg~horsepower, data=Auto) # If family is not specified, fits a linear model
+cv.glm(Auto, glm.fit)$delta # Brute force fitting. Slow!!! Fit each time.
 
 ## LOOCV - fast algorithm hand coded
-fit = glm.fit
 loocv = function(fit){
+  res = residuals(fit)
   h = lm.influence(fit)$h
-  mean((residuals(fit)/(1-h))^2)  
+  mean((res/(1-h))^2)  
 }
 
-loocv(fit)
+loocv(glm.fit)
 
+# Find the best polynomial fit of degree d - going beyond linear fit here
 cv.error = rep(0,5)
 degree = 1:5
 for(d in degree){
-  glm.fit = glm(mpg~poly(horsepower,d), data=Auto)
+  glm.fit = glm(mpg~poly(horsepower,d), data=Auto) # Fit a polynom of degree d
   cv.error[d] = loocv(glm.fit)
 }
-plot(degree, cv.error, type="b")
+plot(degree, cv.error, type="b") # Second order seems to be quite a good fit
 
-## 10-fold cross validation CV
+## 10-fold cross validation CV on the same polynomial fit w/ hyperparemeter of degree d of the polynomial
 cv.error10=rep(0,5)
 for(d in degree){
   glm.fit = glm(mpg~poly(horsepower, d), data=Auto)
@@ -38,7 +42,10 @@ lines(degree, cv.error10, type="b", col="red")
 
 ## Bootstrap
 ## Minimum risk investment - Section 5.2
+## Calculate the best combination of x and y stocks: \alpha x + (1 - \alpha) y
+## Use the bootstrap to calculate standard error on the best \alpha
 
+View(Portfolio)
 alpha = function(x,y){
   vx = var(x)
   vy = var(y)
