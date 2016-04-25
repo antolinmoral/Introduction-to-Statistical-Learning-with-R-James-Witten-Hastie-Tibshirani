@@ -46,4 +46,54 @@ plot(regfit.full,scale="Cp")
 coef(regfit.full, 10)
 ```
 
+Forward Stepwise Selection
+--------------------------
+
+We use `regsubset` again, but specify the `method="forward"` option.
+
+```{r}
+regfit.fwd = regsubsets(Salary~., data=Hitters, nvmax=19, method="forward")
+summary(regfit.fwd)
+plot(regfit.fwd, scale="Cp")
+```
+
+Model Selection Using a Validation Set
+--------------------------------------
+
+Let's make a training and validation set, so that we can choose a good subset model.
+
+```{r}
+dim(Hitters)
+set.seed(1)
+train = sample(seq(263),180,replace=FALSE)
+regfit.fwd = regsubsets(Salary~., data=Hitters[train,], nvmax=19, method="forward")
+```
+
+Now, we separate the data to two parts, one for training and another for test/validation to make prediction. There is no `prediction` method for `regsubsets`, so we need to write that part. We also create a vector to store the results of the 19 different models.
+
+```{r}
+val.errors = rep(NA, 19)
+x.test = model.matrix(Salary~., data=Hitters[-train,])
+for(i in 1:19){
+  coefi = coef(regfit.fwd, id=i)
+  pred = x.test[,names(coefi)]%*%coefi
+  val.errors[i] = mean((Hitters$Salary[-train]-pred)^2)
+}
+plot(sqrt(val.errors), ylab="Root MSE", ylim=c(300,400), pch=19, type="b")
+points(sqrt(regfit.fwd$rss[-1]/180),col="blue",pch=19,type="b") # -1 excludes null model
+legend("topright", legend=c("Training","Validation"),col=c("blue","black"),pch=19)
+```
+
+As expected, the model error goes down monotonically as the model gets bigges, but not so for the validation error.
+
+This was a little tedious - not having a `predict` method `regsubsets`. So we will write one!
+
+```{r}
+predict.regsubsets = function(object, newdata, id, ...){
+  form = as.formula(object.call[[2]])
+  mat = model.matrix(form, newdata)
+  coefi = coef(object, id=id)
+  mat[, names(coefi)] %*% coefi
+}
+```
 
