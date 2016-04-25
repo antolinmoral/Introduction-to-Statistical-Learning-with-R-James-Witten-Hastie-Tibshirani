@@ -139,3 +139,16 @@ cv.ridge = cv.glmnet(x,y,alpha=0)
 plot(cv.ridge)
 ```
 
+Now, we fit the lasso; in `glmnet` it means `alpha=1`
+
+```{r}
+fit.lasso = glmnet(x,y)
+plot(fit.lasso, xvar="lambda", label=TRUE)
+plot(fit.lasso, xvar="dev", label=TRUE)
+cv.lasso = cv.glmnet(x,y)
+plot(cv.lasso)
+coef(cv.lasso) # Picks model one std from minimum to make more parsimonius  
+```
+
+
+
