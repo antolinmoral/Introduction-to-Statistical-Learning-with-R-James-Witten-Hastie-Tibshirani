@@ -118,3 +118,24 @@ for(k in 1:10){ # Loop for folds
 rmse.cv = sqrt(apply(cv.errors,2,mean))
 plot(rmse.cv, pch=19, type="b")
 ```
+
+Ridge regression and the Lasso
+------------------------------
+
+We will use the `glmnet` package, which does not use the formula language, so we will set up an `x` and `y`.
+
+```{r}
+library(glmnet)
+x=model.matrix(Salary~.-1, data=Hitters) # -1 means no intercept
+y=Hitters$Salary
+```
+
+First, we will fit a ridge regression model. This is achived by calling `glmnet` with `alpha=0` (see the help file). There is also a `cv.glmnet` function, which will do the cross validation for us.
+
+```{r}
+fit.ridge = glmnet(x,y,alpha=0)
+plot(fit.ridge, xvar="lambda", label=TRUE)
+cv.ridge = cv.glmnet(x,y,alpha=0)
+plot(cv.ridge)
+```
+
