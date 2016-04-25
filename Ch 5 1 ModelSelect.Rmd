@@ -150,5 +150,18 @@ plot(cv.lasso)
 coef(cv.lasso) # Picks model one std from minimum to make more parsimonius  
 ```
 
+Suppose we want to our earlier train/validation division to select the `lambda` for the lasso.
+
+```{r}
+lasso.tr = glmnet(x[train,], y[train])
+lasso.tr
+pred = predict(lasso.tr, x[-train,])
+dim(pred)
+rmse = sqrt(apply((y[-train]-pred)^2, 2, mean))
+plot(log(lasso.tr$lambda), rmse, type="b", xlab="Log(lambda)")
+lam.best = lasso.tr$lambda[order(rmse)[1]] # Pick best lambda
+lam.best
+coef(lasso.tr, s=lam.best) # sparse matrix format 
+```
 
 
