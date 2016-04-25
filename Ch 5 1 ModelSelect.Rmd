@@ -3,6 +3,7 @@ title: "Ch 5 1 ModelSelect"
 output: pdf_document
 ---
 
+Analyze the ISLR (Introduction to Statistical Learning with R) data package's baseball 'Hitters' data frame:
 
 ```{r}
 library(ISLR)
