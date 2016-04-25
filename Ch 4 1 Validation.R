@@ -11,7 +11,8 @@ View(Auto)
 ## LOOVC - Leave one out cross validation
 ## K-fold cross validation
 glm.fit = glm(mpg~horsepower, data=Auto) # If family is not specified, fits a linear model
-cv.glm(Auto, glm.fit)$delta # Brute force fitting. Slow!!! Fit each time.
+cv.glm(Auto, glm.fit)$delta # Brute force fitting. Slow!!! Fit each time.  
+
 
 ## LOOCV - fast algorithm hand coded
 loocv = function(fit){

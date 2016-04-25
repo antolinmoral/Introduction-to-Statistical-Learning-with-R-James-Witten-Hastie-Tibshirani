@@ -1,0 +1,65 @@
+---
+title: "Ch 5 1 ModelSelect"
+output: html_document
+---
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r}
+summary(cars)
+```
+
+You can also embed plots, for example:
+
+```{r, echo=FALSE}
+plot(cars)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+
+
+```{r}
+library(ISLR)
+summary(Hitters)
+```
+
+There are missing values, before we proceed we will remove them:
+
+```{r}
+with(Hitters, sum(is.na(Salary)))
+Hitters=na.omit(Hitters)
+with(Hitters, sum(is.na(Salary)))
+```
+
+Best Subset regression
+----------------------
+We will now use the package `leaps` to evaluate all the best-subset models.
+```{r}
+library(leaps)
+regfit.full = regsubsets(Salary~., data=Hitters)
+summary(regfit.full)
+```
+
+By default, it gives the first 8 variables best-subset models. Let's do it again for all
+the variables:
+
+```{r}
+regfit.full = regsubsets(Salary~., data=Hitters, nvmax=19)
+reg.summary = summary(regfit.full)
+names(reg.summary)
+plot(reg.summary$cp, xlab="Number of variables", ylab="Cp")
+which.min(reg.summary$cp)
+points(10, reg.summary$cp[10], pch=20, col="red")
+```
+
+There is a method for the `regsubset` object:
+
+```{r}
+plot(regfit.full,scale="Cp")
+coef(regfit.full, 10)
+```
+
+
