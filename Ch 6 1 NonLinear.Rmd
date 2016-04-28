@@ -1,5 +1,5 @@
 ---
-output: pdf_document
+output: html_document
 ---
 Nonlinear models: Polynomials and Splines
 =========================================
@@ -95,7 +95,7 @@ points(jitter(age), I(wage>250)/10, pch="|", cex=0.5)
 Splines
 -------
 
-Splines are more flesible than polynomials but the idea is rather similar. Here we will explore 
+Splines are more flexible than polynomials but the idea is rather similar. Here we will explore 
 cubic splines.
 
 ```{r}
