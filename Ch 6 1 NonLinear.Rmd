@@ -170,3 +170,4 @@ plot.gam(lm1, se=T)
 ```
 
 See the chapter on `gam` for more in Introduction to Statistical Learning.
+
