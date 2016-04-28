@@ -1,0 +1,97 @@
+---
+output: html_document
+---
+Nonlinear models
+================
+
+Explore nonlinear models using R tools.
+
+```{r}
+require(ISLR)
+attach(Wage)
+```
+
+Polynomials
+------------
+
+Focus on a single predictor, age:
+
+```{r}
+fit = lm(wage~poly(age,4),data = Wage)
+summary(fit)
+```
+
+The `poly()` function generates a basis of *orthogonal polynomials*.
+Let's make a plot of the fitted function, along with the standard
+errors of the fit.
+
+```{r} 
+agelims = range(age)
+age.grid = seq(from=agelims[1],to=agelims[2])
+pred = predict(fit, newdata = list(age=age.grid), se=T)
+se.bands = cbind(pred$fit+2*pred$se,pred$fit-2*pred$se)
+plot(age, wage, col="darkgrey")
+lines(age.grid, pred$fit, lwd=2, col="blue")
+matlines(age.grid, se.bands, col="blue", lty=2)
+```
+
+There are other ways of fitting a polynomials in R. For example:
+
+```{r}
+fita = lm(wage~age+I(age^2)+I(age^3)+I(age^4), data=Wage)
+summary(fita)
+```
+
+Above `I()` wrapper is used because `age^2` means something to the formula language,
+while `I(age^2)`  is protected.
+
+The coefficients are different, but the fits are the same. 
+
+```{r}
+plot(fitted(fit), fitted(fita))
+```
+
+By using orthogonal polynomials in this simple way, it turns out 
+that we can separately test for each coefficients. So we look at the summary again,
+we can see that the linear, quadratic, and cubic terms are significant, but not the quartic.
+
+This only works  with linear regression, and if there is a single predictor.
+In general, we would use `anova()` as this next example demonstrates.
+This is an example of nested sequence of complexity:
+
+```{r}
+fita = lm(wage~education, data=Wage)
+fitb = lm(wage~education+age, data=Wage)
+fitc = lm(wage~education+poly(age,2), data=Wage)
+fitd = lm(wage~education+poly(age,3), data=Wage)
+anova(fita, fitb, fitc, fitd)
+```
+
+### Polynomial logistic regression
+
+Now we fit a logistic regression model to a binary response variable,
+constructed from `wage`. We code the big earners (`>250k`) as 1, else 0
+
+```{r}
+fita = glm(I(wage > 250) ~ poly(age,2), data=Wage, family=binomial)
+fitb = glm(I(wage > 250) ~ poly(age,3), data=Wage, family=binomial)
+anova(fita, fitb)
+summary(fit)
+preds = predict(fitb, list(age=age.grid), se=T)
+se.bands = preds$fit + cbind(fit=0, lower=-2*preds$se, upper=2*preds$se)
+se.bands[1:5,]
+```
+
+The above calculations are on the logit scale. We need to transform it back using
+the inverse logit $$p=\frac{e^\eta}{1+e^\eta}.$$ We can do this simultaneously for all 
+three columns of `se.bands`:
+
+```{r}
+prob.bands = exp(se.bands)/(1+exp(se.bands))
+matplot(age.grid, prob.bands, col="blue", lwd=c(2,1,1), lty=c(1,2,2), type="l", ylim=c(0,0.1))
+points(jitter(age), I(wage>250)/10, pch="|", cex=0.5)
+```
+
+
+
+
