@@ -1,0 +1,56 @@
+---
+title: "Trees-Random-Forest-Boosting"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Decision Tree
+=============
+
+We will examine the `Carseats` data using the `tree` package in R, 
+as in the lab in the book (Introduction to Statistical Learning with R).
+
+We create a binary response variable `High` (for high sales) and we include
+it in the same dataframe.
+
+```{r}
+require(ISLR)
+require(tree)
+attach(Carseats)
+View(Carseats)
+hist(Sales)
+High = ifelse(Sales<=8, "No", "Yes")
+Carseats = data.frame(Carseats, High)
+```
+
+Now, we fit a tree to these data, and summarize and plot it. Notice we have to _exclude_ `Sales` from the right-hand side of the formula, because the response is derived from it. This fit is the simplest possible,
+there are two possible outcomes.
+
+```{r}
+tree.carseats = tree(High~.-Sales, data=Carseats)
+summary(tree.carseats)
+plot(tree.carseats)
+text(tree.carseats, pretty=0)
+```
+
+For a detailed summary of the tree, print it:
+
+```{r}
+tree.carseats
+```
+
+Let's create training and test sets (250, 150) of the 400 observations.
+
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
