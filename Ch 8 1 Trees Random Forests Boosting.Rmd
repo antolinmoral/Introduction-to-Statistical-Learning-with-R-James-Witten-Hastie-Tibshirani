@@ -42,7 +42,42 @@ For a detailed summary of the tree, print it:
 tree.carseats
 ```
 
-Let's create training and test sets (250, 150) of the 400 observations.
+Let's create training and test sets (250, 150) of the 400 observations. Grow the tree on the training set
+and evaluate the tree on the test set.
+
+```{r}
+set.seed(1011)
+train = sample(1:nrow(Carseats), 250)
+tree.carseats = tree(High~.-Sales, Carseats, subset = train)
+plot(tree.carseats); text(tree.carseats, pretty = 0)
+tree.pred = predict(tree.carseats, Carseats[-train,], type="class")
+with(Carseats[-train,], table(tree.pred, High))
+cat("Error rate:", (72+33)/150)
+```
+
+This tree was grown to full depth, amd might be too variable. We now use CV to prune it.
+
+```{r}
+cv.carseats = cv.tree(tree.carseats, FUN=prune.misclass)
+cv.carseats
+plot(cv.carseats) # 13 nodes seem to be enough to keep
+prune.carseats = prune.misclass(tree.carseats, best=13)
+plot(prune.carseats); text(prune.carseats, pretty = 0)
+```
+
+Now, let's evaluate this pruned tree on the test data:
+
+```{r}
+tree.pred = predict(prune.carseats, Carseats[-train,], type="class")
+with(Carseats[-train,], table(tree.pred, High))
+cat("Confusion table", (72+32)/150)
+```
+
+Did not get much from pruning, except for a shallower tree, which is easier to interpret.
+
+
+
+
 
 
 ## Including Plots
