@@ -1,6 +1,6 @@
 ---
 title: "Trees-Random-Forest-Boosting"
-output: pdf_document
+output: html_document
 ---
 
 ```{r setup, include=FALSE}
@@ -77,15 +77,59 @@ Did not get much from pruning, except for a shallower tree, which is easier to i
 
 
 
+Random forest and Boosting
+==========================
 
+These models use trees as building blocks to build more complex models. 
 
+Here we will use the Boston housing data to explore random forest and boosting. These data
+are in the `MASS` package. It gives housing values and other statistics  in each of the 506 
+suburbs of Boston based on a 1970 census.
 
-## Including Plots
+Random Forests
+--------------
+Random forests build bushy trees and then average them to reduce variance.
 
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r}
+require(randomForest)
+require(MASS)
+set.seed(101)
+dim(Boston) # (505, 14)
+train = sample(1:nrow(Boston), 300)
+?Boston
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+Let's fit a random forest and see how well it performs. We will use
+the `medv`, the median housing value (in \$1K dollars)
+
+```{r}
+rf.boston = randomForest(medv~., data=Boston, subset=train)
+rf.boston
+```
+
+The MSR and the % variance explained on OOB  or out-of-bag estimates, 
+a very clever device in random forests to get honest error estimates.
+The model reports that `mtry=4`, which is the number of variables randomly
+chosen at each split. Since $p=13$ here, we could try all 13 possible 
+values of `mtry`. We will do so, record the results, and make a plot.
+
+```{r}
+oob.err = double(13)
+test.err = double(13)
+for(mtry in 1:13){
+  fit = randomForest(medv~., data=Boston, subset=train, mtry=mtry, ntree=400)
+  oob.err[mtry] = fit$mse[400]
+  pred = predict(fit, Boston[-train,])
+  test.err[mtry] = with(Boston[-train,], mean((medv-pred)^2))
+  cat(mtry, " ")
+}
+matplot(1:mtry, cbind(test.err, oob.err), pch=19, col=c("red","blue"), type="b", ylab="Mean Squared Error")
+legend("topright", legend=c("Test","OOB"), pch=19, col=c("red","blue"))
+```
+
+Here mtry=1 corresponds to a single tree (though no prining here as in the simple
+decision tree case), while mtry=13 corresponds to bagging, when all 13 variables
+are used in every split in the tree.
+
+
